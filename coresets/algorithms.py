@@ -118,8 +118,8 @@ def _calculate_lr_sensitivities(data, R, ball_center, cluster_info):
     num_samples = data.shape[0]
     log_cluster_sizes = np.log(cluster_sizes)
     sensitivities = np.zeros(num_samples)
-    for n in xrange(num_samples):
-        print(n)
+    for n in range(num_samples):
+        #print(n)
         k = cluster_assignments[n]
         true_mean = cluster_means[k,:].copy()
         # cluster_means[k,:] = cluster_means[k,:]*K/(K-1) - data[n,:]/(K-1),
@@ -250,7 +250,7 @@ def construct_lr_coreset(data, cluster_centers, cluster_assignments=None,
             not isinstance(output_size_param[0], float) or
             not isinstance(output_size_param[1], float) or
             output_size_param[0] <= 0.0 or output_size_param[0] > 0.25 or
-            output_size_param <= 0.0 or output_size_param[1] >= 1.0):
+            output_size_param[1] <= 0.0 or output_size_param[1] >= 1.0):
             raise ValueError("If output_size_param is a tuple, it must be of "
                              "the form (eps, delta) with 0.0 < eps < 0.25 and "
                              "0.0 < delta < 1.0, but a value of %s was passed" %
@@ -263,7 +263,7 @@ def construct_lr_coreset(data, cluster_centers, cluster_assignments=None,
 
     # If the coreset size isn't much smaller than the original data size,
     # just return the data
-    if coreset_size > max_coreset_size:
+    if isinstance(coreset_size, int) and coreset_size > max_coreset_size:
         if verbose:
             print("Coreset size would be %d, but only %d samples total" %
                   (coreset_size, num_samples))

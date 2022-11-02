@@ -11,7 +11,7 @@ from numpy.testing import *
 import os, shutil
 import numpy as np
 import numpy.random as npr
-import cPickle as cpk
+import pickle as cpk
 
 
 npr.seed(1)
@@ -85,21 +85,21 @@ def test_result_save_load():
         r = Result()
         r.populate('target', 'alg', 'dataset', 4, 50, {'prm1': 3, 'prm2':4})
         try:
-            f = open('test_result.pk', 'w')
+            f = open('test_result.pk', 'wb')
             cpk.dump(r, f)
         except IOError as e:
-            print 'Error: Failure to write results to disk'
+            print('Error: Failure to write results to disk')
             raise
         finally:
             f.close()
 
-        print 'R'
+        print('R')
         r.disp()
 
         # now load without any checking, and then make sure they're equal
         r2 = Result()
         r2.load('test_result.pk')
-        print 'R2:'
+        print('R2:')
         r2.disp()
         assert r == r2
 
@@ -107,7 +107,7 @@ def test_result_save_load():
         r3 = Result()
         r3.populate('target', 'alg', 'dataset', 4, 50, {'prm0': 3, 'prm2':5})
         r3.load('test_result.pk', check=True)
-        print 'R3:'
+        print('R3:')
         r3.disp()
         assert r3 != r
 
@@ -115,7 +115,7 @@ def test_result_save_load():
         r4 = Result()
         r4.populate('target', 'alg', 'dataset', 4, 50, {'prm1': 3, 'prm2':4})
         r4.load('test_result.pk', check=True)
-        print 'R4:'
+        print('R4:')
         r4.disp()
         assert r4 == r
     finally:
@@ -132,8 +132,8 @@ def test_insert_mean_std():
     r = None
     fcn = lambda x : li
     _insert_mean_std(w, fcn, r)
-    print li
-    print w
+    print(li)
+    print(w)
     assert len(w) == 1
     assert len(w[0]) == 2
     assert w[0][0] == 2
@@ -142,8 +142,8 @@ def test_insert_mean_std():
     w = []
     li = [1]
     fcn = lambda x : li
-    print li
-    print w
+    print(li)
+    print(w)
     _insert_mean_std(w, fcn, r)
     assert len(w) ==1
     assert len(w[0]) == 2
@@ -155,7 +155,7 @@ def test_get_colormap():
     custom_map = {'Name1' : (1, 1, 1), 'Name2' : (.1, .1, .1)}
     names = ['Name', 'Another Name', 'Name1']
     cmap = _get_colormap(names, 'hls', custom_map)
-    print cmap
+    print(cmap)
     assert len(cmap) == 4
     assert cmap['Name1'] == (1, 1, 1)
     assert cmap['Name2'] == (.1, .1, .1)

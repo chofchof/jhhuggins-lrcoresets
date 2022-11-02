@@ -24,7 +24,7 @@ def _generate_cluster_data(cluster_centers, points_per_cluster,
     # data uniformly distributed between -1 and 1 around centers
     data = 2 * npr.rand(num_clusters * points_per_cluster, data_dim) - 1
     data = data + np.tile(cluster_centers, (points_per_cluster, 1))
-    data = np.asmatrix(data)
+    data = np.asarray(data)
     if return_assignments:
         cluster_assignments = np.tile(np.arange(num_clusters),
                                       points_per_cluster)
@@ -34,9 +34,9 @@ def _generate_cluster_data(cluster_centers, points_per_cluster,
 
 
 def test_calculate_cluster_information():
-    cluster_centers = np.matrix([[0, 0, 0, 0],
-                                 [-10, 0, 0, 0],
-                                 [0, 5, 5, 0]], dtype=np.float)
+    cluster_centers = np.array([[0, 0, 0, 0],
+                                [-10, 0, 0, 0],
+                                [0, 5, 5, 0]], dtype=np.float64)
     points_per_cluster = 50
     data, true_assignments = \
         _generate_cluster_data(cluster_centers, points_per_cluster, True)
@@ -63,10 +63,10 @@ def test_calculate_cluster_information():
 def test_calculate_lr_sensitivities():
     # NB: this test will likely fail if test_calculate_cluster_information()
     # fails
-    cluster_centers = np.matrix([[0, 0, 0],
-                                 [2, 2, 2]], dtype=np.float)
-    data = np.matrix([[0, 0, 0],
-                      [2, 2, 2]], dtype=np.float)
+    cluster_centers = np.array([[0, 0, 0],
+                                [2, 2, 2]], dtype=np.float64)
+    data = np.array([[0, 0, 0],
+                     [2, 2, 2]], dtype=np.float64)
     dist = euclidean(data[0,:], data[1,:])
     points_per_cluster = 50
     data = np.tile(data, (points_per_cluster, 1))
@@ -81,9 +81,9 @@ def test_calculate_lr_sensitivities():
 
 
 def test_assign_lr_sensitivities_cython():
-    cluster_centers = np.matrix([[0, 0, 0],
-                                 [-10, 0, 0],
-                                 [0, 5, 5]], dtype=np.float)
+    cluster_centers = np.array([[0, 0, 0],
+                                [-10, 0, 0],
+                                [0, 5, 5]], dtype=np.float64)
     num_clusters, num_features = cluster_centers.shape
     points_per_cluster = 100
     R = 2.0
@@ -105,11 +105,12 @@ def test_assign_lr_sensitivities_cython():
     assert_allclose(py_sensitivities, csr_sensitivities)
 
 
-@dec.slow
+import pytest
+@pytest.mark.slow
 def test_construct_lr_coreset_eps_delta():
-    cluster_centers = np.matrix([[0, 0, 0],
-                                 [-10, 0, 0],
-                                 [0, 5, 5]], dtype=np.float)
+    cluster_centers = np.array([[0, 0, 0],
+                                [-10, 0, 0],
+                                [0, 5, 5]], dtype=np.float64)
     num_clusters, num_features = cluster_centers.shape
     eps = .24
     delta = .01
@@ -119,7 +120,7 @@ def test_construct_lr_coreset_eps_delta():
                                       * np.log(expected_sensitivity)
                                       - np.log(delta)) + 1)
 
-    points_per_cluster = expected_coreset_size * 3 / num_clusters
+    points_per_cluster = expected_coreset_size * 3 // num_clusters
     if points_per_cluster * num_clusters > 4e5:
         warn("Testing coreset construction on %d samples, "
              "so test may be slow." % (points_per_cluster * num_clusters),
@@ -157,13 +158,13 @@ def test_construct_lr_coreset_eps_delta():
 
 
 def test_construct_lr_coreset_coreset_size():
-    cluster_centers = np.matrix([[0, 0, 0],
-                                 [-10, 0, 0],
-                                 [0, 5, 5]], dtype=np.float)
+    cluster_centers = np.array([[0, 0, 0],
+                                [-10, 0, 0],
+                                [0, 5, 5]], dtype=np.float64)
     num_clusters, num_features = cluster_centers.shape
     coreset_size = 300
 
-    points_per_cluster = coreset_size * 10 / num_clusters
+    points_per_cluster = coreset_size * 10 // num_clusters
     if points_per_cluster * num_clusters > 4e5:
         warn("Testing coreset construction on %d samples, "
              "so test may be slow." % (points_per_cluster * num_clusters),
@@ -180,7 +181,7 @@ def test_construct_lr_coreset_coreset_size():
     assert_array_equal(coreset_size, coreset.shape[0])
 
     # Should not create a coreset
-    coreset_size = data.shape[0] * 2 / 3
+    coreset_size = data.shape[0] * 2 // 3
     coreset, weights, mean_sensitivity, success = \
         algs.construct_lr_coreset(data, cluster_centers,
                                   output_size_param=coreset_size,

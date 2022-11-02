@@ -9,10 +9,10 @@ from coresets.utils import *
 
 def test_create_folder_if_not_exist():
     try:
-        print 'Creating test folder...'
+        print('Creating test folder...')
         create_folder_if_not_exist('test_folder')
         assert os.path.exists('test_folder')
-        print 'Trying to recreate test folder...'
+        print('Trying to recreate test folder...')
         create_folder_if_not_exist('test_folder')
         assert os.path.exists('test_folder')
     finally:

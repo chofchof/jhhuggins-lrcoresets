@@ -23,14 +23,14 @@ def create_folder_if_not_exist(path):
 
 
 def call_with_superset_args(f, args):
-    fargs = inspect.getargspec(f)[0]
+    fargs = inspect.getfullargspec(f)[0]
     return f(**{k : args[k] for k in args.keys() if k in fargs})
 
 
 def pretty_file_string_from_dict(d):
     if len(d) == 0:
         return ''
-    keys = d.keys()
+    keys = list(d.keys())
     keys.sort()
     s = '-'.join(['%s=%s' % (k, d[k]) for k in keys if not callable(d[k])])
     return s

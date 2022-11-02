@@ -12,9 +12,9 @@ setup(
     url='https://bitbucket.org/jhhuggins/coresets-for-logistic-regression/',
     packages=['coresets'],
     package_data={'coresets' : ['*.so']},
-    install_requires=[
-        'Cython >= 0.20.1', 'numpy', 'scipy', 'matplotlib',
-        'sklearn', 'h5py', 'seaborn', 'nose', 'future'],
+#    install_requires=[
+#        'Cython >= 0.20.1', 'numpy', 'scipy', 'matplotlib',
+#        'sklearn', 'h5py', 'seaborn', 'nose', 'future'],
     ext_modules = cythonize("coresets/*.pyx"),
     include_dirs = [np.get_include()],
     keywords = ['Bayesian', 'logistic regression', 'scalable inference',

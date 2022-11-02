@@ -119,7 +119,7 @@ class PolynomialKernel(Kernel):
     """
     The polynomial kernel
 
-    The polynomial kernel is ``k(x,y) = (1 + theta * <x,y>)^degree``.
+    The polynomial kernel is ``k(x,y) = (theta + <x,y>)^degree``.
     """
     def __init__(self, degree, theta=0.2):
         Kernel.__init__(self)

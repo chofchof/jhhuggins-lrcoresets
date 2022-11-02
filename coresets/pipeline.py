@@ -8,7 +8,7 @@ from collections import defaultdict
 import numpy as np
 import numpy.random as npr
 import scipy.sparse as sp
-import cPickle as cpk
+import pickle as cpk
 import time
 
 from coresets.data import load_data
@@ -60,7 +60,7 @@ class Result(object):
 
     def load(self, fname, check=False):
         try:
-            f = open(fname, 'r')
+            f = open(fname, 'rb')
             r = cpk.load(f)
             n_old = len(r.alg_times)
             if (len(r.alg_times) != n_old
@@ -103,6 +103,8 @@ class Result(object):
         except IOError as e:
             print('File %s does not yet exist, so starting from scratch'
                     % os.path.basename(fname))
+        except EOFError:
+            f.close()
         else:
             f.close()
 
@@ -224,8 +226,8 @@ class Experiment(object):
         if target_alg_steps is None:
             target_alg_steps = steps
         if warmup is None:
-            warmup = max(1, steps / 2)
-            target_alg_warmup = max(1, target_alg_steps / 2)
+            warmup = max(1, steps // 2)
+            target_alg_warmup = max(1, target_alg_steps // 2)
         else:
             target_alg_warmup = max(1, warmup)
 
@@ -284,7 +286,7 @@ class Experiment(object):
                           warmup, 'iterations and with the following',
                           'parameters:',
                           ", ".join(["%s=%s" % item for
-                                        item in prms.iteritems()]))
+                                        item in prms.items()]))
                     self._run_alg(dname, aname, alg, prms, sampler, n_trials,
                                   X, y, X_test, y_test, target_samples,
                                   self.target_name)
@@ -377,13 +379,13 @@ class Experiment(object):
             random_state = npr.get_state()
 
             # generate subsample via alg
-            t0 = time.clock()
+            t0 = time.process_time()
             subsample, weights = call_with_superset_args(alg, args)
-            t1 = time.clock()
+            t1 = time.process_time()
 
             # run posterior inference
             theta_samples, accept_rate = sampler(subsample, weights)
-            t2 = time.clock()
+            t2 = time.process_time()
 
             # record timing/seed/names/samples/accept rates
             alg_time = t1 - t0
@@ -417,7 +419,7 @@ class Experiment(object):
         r.theta_samples_list.extend(theta_samples_list)
         # save the results
         try:
-            f = open(fname, 'w')
+            f = open(fname, 'wb')
             cpk.dump(r, f)
         except IOError as e:
             print('Error: Failure to write results to disk')
@@ -444,7 +446,7 @@ def _get_colormap(names, palette_id, custom_map={}):
     for i, nm in enumerate(unq_names):
         cmap[nm] = unq_palette[i + offset]
     if custom_map is not None:
-        for key, value in custom_map.iteritems():
+        for key, value in custom_map.items():
             cmap[key] = value
     return cmap
 
@@ -551,7 +553,7 @@ def plot_results(dirname, x_selector=None, y_selector=None, z_selector=None,
     for fn in os.listdir(dirname):
         if not fn.endswith('.cpk'):
             continue
-        with open(os.path.join(dirname, fn), 'r') as f:
+        with open(os.path.join(dirname, fn), 'rb') as f:
             r = cpk.load(f)
         if r.alg_name in excluded_algs:
             continue
@@ -651,7 +653,7 @@ def plot_means_and_vars(dirname, target_name, selector_name, selector,
     for fn in os.listdir(dirname):
         if not fn.endswith('.cpk'):
             continue
-        with open(os.path.join(dirname, fn), 'r') as f:
+        with open(os.path.join(dirname, fn), 'rb') as f:
             r = cpk.load(f)
         if r.alg_name != target_name:
             key = (r.alg_name, r.data_name, selector(r))
@@ -722,7 +724,7 @@ def plot_subsample(dname, dtype, fname, x_comp, y_comp, subsample_index=0,
     Z = y[:, np.newaxis]*X
     # load the subsampled data
     try:
-        f = open(fname, 'r')
+        f = open(fname, 'rb')
         r = cpk.load(f)
     except IOError as e:
         print('Error: Failure to read results from disk')

@@ -24,8 +24,8 @@ def test_mean_relative_squared_error():
                 expected_mrse = (t_mean - o_mean)**2 / t_stdev**2
                 mrse = ceval.mean_relative_squared_error(target, other,
                                                          None, None)
-                print t_stdev, t_mean, o_mean
-                print np.mean(target, 0)
-                print np.mean(other, 0)
-                print np.var(target, 0)
+                print(t_stdev, t_mean, o_mean)
+                print(np.mean(target, 0))
+                print(np.mean(other, 0))
+                print(np.var(target, 0))
                 assert_allclose(expected_mrse, mrse, rtol=.05)

@@ -347,8 +347,8 @@ def generate_synthetic_data(args, dsname, train, test):
             pos_prob = .5
         else:
             pos_prob = .01
-        means[0, :DIM/2] = 1.
-        means[1, DIM/2:] = 1.
+        means[0, :DIM//2] = 1.
+        means[1, DIM//2:] = 1.
         generate_reverse_mixture(TRAIN_SIZE, pos_prob, means, covar, train_file)
         generate_reverse_mixture(TEST_SIZE, pos_prob, means, covar, test_file)
     else:
